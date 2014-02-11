@@ -13,7 +13,7 @@ F_CPU = 16000000UL
 MCU = atmega328p
 
 #Compilation flags
-FLAGS = -O2
+FLAGS = -O2 -std=c++11
 
 #Directory where binaries are generated
 BUILD_DIRECTORY = build
@@ -21,6 +21,9 @@ BUILD_DIRECTORY = build
 all: build
 	 avr-g++ $(FLAGS) -DF_CPU=$(F_CPU) -mmcu=$(MCU) -o $(BUILD_DIRECTORY)/bin.elf $(SOURCE_FILES)
 	 avr-objcopy -O ihex -R .eeprom $(BUILD_DIRECTORY)/bin.elf $(BUILD_DIRECTORY)/bin.hex
+
+asm: build
+	 avr-g++ $(FLAGS) -S -DF_CPU=$(F_CPU) -mmcu=$(MCU) -o $(BUILD_DIRECTORY)/bin.asm $(SOURCE_FILES)
 
 build:
 	 mkdir -p $(BUILD_DIRECTORY)
@@ -33,5 +36,5 @@ install-isp: all
 clean:
 	 rm -rf $(BUILD_DIRECTORY)
 
-.PHONY: all build install-arduino install-isp clean
+.PHONY: all build asm install-arduino install-isp clean
 
