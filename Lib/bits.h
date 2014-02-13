@@ -1,5 +1,5 @@
-#ifndef BITSET_H
-#define BITSET_H
+#ifndef BITS_H
+#define BITS_H
 
 #include "types.h"
 
