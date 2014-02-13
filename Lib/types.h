@@ -8,8 +8,10 @@
  */
 typedef uint8_t byte;
 typedef volatile uint8_t* bytePtr;
+typedef volatile uint8_t& byteRef;
 typedef uint16_t word;
 typedef volatile uint16_t* wordPtr;
+typedef volatile uint16_t& wordRef;
 
 /**
  * Definition of byte and word
@@ -56,21 +58,53 @@ struct Type {
 
 /**
  * Trait specialization for byte
+ * and associated types
  */
 template <>
 struct Type <byte> {
     typedef byte type;
     typedef bytePtr ptr;
+    typedef byteRef ref;
+    typedef ByteBitNum bitNum;
+};
+template <>
+struct Type <bytePtr> {
+    typedef byte type;
+    typedef bytePtr ptr;
+    typedef byteRef ref;
+    typedef ByteBitNum bitNum;
+};
+template <>
+struct Type <byteRef> {
+    typedef byte type;
+    typedef bytePtr ptr;
+    typedef byteRef ref;
     typedef ByteBitNum bitNum;
 };
 
 /**
  * Trait specialization for word
+ * and associated types
  */
 template <>
 struct Type <word> {
     typedef word type;
     typedef wordPtr ptr;
+    typedef wordRef ref;
+    typedef WordBitNum bitNum;
+};
+template <>
+struct Type <wordPtr> {
+    typedef word type;
+    typedef wordPtr ptr;
+    typedef wordRef ref;
+    typedef WordBitNum bitNum;
+};
+template <>
+struct Type <wordRef> {
+    typedef word type;
+    typedef wordPtr ptr;
+    typedef wordRef ref;
     typedef WordBitNum bitNum;
 };
 
