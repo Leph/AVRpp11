@@ -108,5 +108,33 @@ struct Type <wordRef> {
     typedef WordBitNum bitNum;
 };
 
+/**
+ * Define both logic levels
+ * low and high (false or true)
+ */
+enum logic : uint8_t
+{
+    LOW = 0,
+    HIGH = 1,
+    FALSE = 0,
+    TRUE = 1,
+};
+
+/**
+ * Define logic operator
+ */
+inline logic operator||(logic a, logic b)
+{
+    return (logic)(a | b);
+}
+inline logic operator&&(logic a, logic b)
+{
+    return (logic)(a & b);
+}
+inline logic operator!(logic a)
+{
+    return (logic)(!(uint8_t)a);
+}
+
 #endif
 
