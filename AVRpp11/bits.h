@@ -1,8 +1,6 @@
 #ifndef BITS_H
 #define BITS_H
 
-#include "types.h"
-
 namespace bits {
 
 /**
