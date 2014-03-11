@@ -89,7 +89,7 @@ inline logic get(volatile T& mem, BitNum num)
 template <class T>
 inline void set(volatile T& mem, BitNum num, logic value)
 {
-    if (value == TRUE) {
+    if (value == True) {
         add(mem, num);
     } else {
         clear(mem, num);

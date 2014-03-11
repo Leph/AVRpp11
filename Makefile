@@ -25,6 +25,9 @@ all: build
 asm: build
 	 avr-g++ $(FLAGS) -S -DF_CPU=$(F_CPU) -mmcu=$(MCU) -o $(BUILD_DIRECTORY)/bin.asm $(SOURCE_FILES)
 
+def: build
+	 avr-g++ $(FLAGS) -E -DF_CPU=$(F_CPU) -mmcu=$(MCU) $(SOURCE_FILES)
+
 build:
 	 mkdir -p $(BUILD_DIRECTORY)
 
@@ -36,5 +39,5 @@ install-isp: all
 clean:
 	 rm -rf $(BUILD_DIRECTORY)
 
-.PHONY: all build asm install-arduino install-isp clean
+.PHONY: all build asm def install-arduino install-isp clean
 

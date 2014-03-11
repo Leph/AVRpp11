@@ -4,21 +4,6 @@
 namespace gpio {
 
 /**
- * Forward declaration of Gpio pin
- * (to be declared in devices implementation)
- */
-enum GpioPin : uint8_t;
-
-/**
- * Declare trait class for 
- * Gpio pin registers definition
- * (to be specialize in devices implementation)
- */
-template <GpioPin T>
-struct GpioPinReg {
-};
-
-/**
  * Gpio pin mode
  */
 enum GpioMode : uint8_t
@@ -29,82 +14,88 @@ enum GpioMode : uint8_t
 };
 
 /**
- * Set mode implementation
- * (no function template partial specialization)
+ * Gpio data structure for
+ * runtime mapping
  */
-template <GpioPin pin, GpioMode mode>
-struct GpioModeImpl 
+struct GpioMappingEntry
 {
-};
-template <GpioPin pin>
-struct GpioModeImpl<pin, Input>
-{
-    static void exec()
-    {
-        bits::set(
-            *GpioPinReg<pin>::DirReg,
-            GpioPinReg<pin>::DirBit,
-            LOW);
-    }
-};
-template <GpioPin pin>
-struct GpioModeImpl<pin, Output>
-{
-    static void exec()
-    {
-        bits::set(
-            *GpioPinReg<pin>::DirReg,
-            GpioPinReg<pin>::DirBit,
-            HIGH);
-    }
-};
-template <GpioPin pin>
-struct GpioModeImpl<pin, InputPullUp>
-{
-    static void exec()
-    {
-        bits::set(
-            *GpioPinReg<pin>::DirReg,
-            GpioPinReg<pin>::DirBit,
-            LOW);
-        bits::set(
-            *GpioPinReg<pin>::OutReg,
-            GpioPinReg<pin>::OutBit,
-            HIGH);
-    }
+    const bytePtr dirReg;
+    const bytePtr outReg;
+    const bytePtr inReg;
+    const bits::BitNum num;
 };
 
 /**
- * Set for the given Pin the given Mode
+ * Gpio pin declaration
+ * for device specific layout
  */
-template <GpioPin pin, GpioMode m>
-inline void mode()
+enum GpioPin : uint8_t
 {
-    GpioModeImpl<pin, m>::exec();
+    #define X(Pin, Port, Num) Pin,
+    GPIO_DEFINES
+    #undef X
+};
+
+/**
+ * Gpio runtime global array
+ * with device specific mapping
+ */
+const GpioMappingEntry GpioMapping[] = {
+    #define X(Pin, Port, Num) \
+    { \
+        &DDR##Port, \
+        &PORT##Port, \
+        &PIN##Port, \
+        bits::Bit##Num \
+    },
+    GPIO_DEFINES
+    #undef X
+};
+
+/**
+ * Set the given Gpio Pin to given mode
+ */
+inline void mode(GpioPin pin, GpioMode mode)
+{
+    if (mode == Input) {
+        bits::clear(
+            *(GpioMapping[pin].dirReg),
+            GpioMapping[pin].num);
+    } else if (mode == Output) {
+        bits::add(
+            *(GpioMapping[pin].dirReg),
+            GpioMapping[pin].num);
+    } else if (mode == InputPullUp) {
+        bits::clear(
+            *(GpioMapping[pin].dirReg),
+            GpioMapping[pin].num);
+        bits::add(
+            *(GpioMapping[pin].outReg),
+            GpioMapping[pin].num);
+    }
 }
 
 /**
- * Set given output logic value for
- * given Pin
+ * Write given logical value to given
+ * Gpio Pin (should be Output mode)
  */
-template <GpioPin pin>
-inline void write(logic value)
+inline void write(GpioPin pin, logic value)
 {
     bits::set(
-        *GpioPinReg<pin>::OutReg,
-        GpioPinReg<pin>::OutBit,
+        *(GpioMapping[pin].outReg),
+        GpioMapping[pin].num, 
         value);
 }
 
 /**
- * Retrive from given Pin input logic value
+ * Read and return the logical value
+ * of given Gpio Pin (should be in Input mode)
  */
-template <GpioPin pin>
-inline logic read()
+inline logic read(GpioPin pin)
 {
     return bits::get(
-        *GpioPinReg<pin>::InReg,
-        GpioPinReg<pin>::InBit);
+        *(GpioMapping[pin].inReg),
+        GpioMapping[pin].num);
 }
 
 }

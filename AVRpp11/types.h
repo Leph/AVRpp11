@@ -19,10 +19,10 @@ typedef volatile uint16_t& wordRef;
  */
 enum logic : uint8_t
 {
-    LOW = 0,
-    HIGH = 1,
-    FALSE = 0,
-    TRUE = 1,
+    Low = 0,
+    High = 1,
+    False = 0,
+    True = 1,
 };
 
 /**
