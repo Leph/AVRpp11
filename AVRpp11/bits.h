@@ -6,25 +6,26 @@ namespace bits {
 /**
  * Definition of bit numbers
  * up to 16 bits (word)
+ * zero indexed
  */
 enum BitNum : uint8_t
 {
-    Bit1 = 0,
-    Bit2 = 1,
-    Bit3 = 2,
-    Bit4 = 3,
-    Bit5 = 4,
-    Bit6 = 5,
-    Bit7 = 6,
-    Bit8 = 7,
-    Bit9 = 8,
-    Bit10 = 9,
-    Bit11 = 10,
-    Bit12 = 11,
-    Bit13 = 12,
-    Bit14 = 13,
-    Bit15 = 14,
-    Bit16 = 15,
+    Bit0 = 0,
+    Bit1 = 1,
+    Bit2 = 2,
+    Bit3 = 3,
+    Bit4 = 4,
+    Bit5 = 5,
+    Bit6 = 6,
+    Bit7 = 7,
+    Bit8 = 8,
+    Bit9 = 9,
+    Bit10 = 10,
+    Bit11 = 11,
+    Bit12 = 12,
+    Bit13 = 13,
+    Bit14 = 14,
+    Bit15 = 15,
 };
 
 /**

@@ -14,8 +14,8 @@ enum GpioMode : uint8_t
 };
 
 /**
- * Data structure
- * representing Gpio Pin
+ * General purpose
+ * Inpur Output pin
  */
 struct GpioEntry
 {
