@@ -6,6 +6,7 @@
 #include "types.h"
 #include "bits.h"
 #include "gpio.h"
+#include "usart.h"
 
 #endif
 

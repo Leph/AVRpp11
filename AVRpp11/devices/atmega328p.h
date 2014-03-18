@@ -25,5 +25,8 @@
     X(Pin27, C, 4) \
     X(Pin28, C, 5)
 
+#define USART_DEFINES \
+    X(Usart0, UDR0, UCSR0A, UCSR0B, UCSR0C, UBRR0)
+
 #endif
 
