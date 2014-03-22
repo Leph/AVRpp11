@@ -53,12 +53,21 @@ struct GpioEntry
     }
 
     /**
-     * Read and return the logical value
+     * Read and return the logical input value
      * of the Gpio Pin (should be in Input mode)
      */
     inline logic read() const
     {
         return bits::get(*inReg, num);
+    }
+
+    /**
+     * Read and return the logical outup value
+     * of current Gpio Pin
+     */
+    inline logic readOutput() const
+    {
+        return bits::get(*outReg, num);
     }
 };
 
