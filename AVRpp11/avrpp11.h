@@ -6,9 +6,9 @@
 
 #include "types.h"
 #include "bits.h"
+#include "isr.h"
 #include "gpio.h"
 #include "usart.h"
-#include "isr.h"
 
 #endif
 

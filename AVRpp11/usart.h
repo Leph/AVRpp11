@@ -4,6 +4,23 @@
 namespace usart {
 
 /**
+ * Usart specific interrupt handler
+ */
+struct UsartEntry;
+typedef isr::Handler<UsartEntry> Handler;
+
+/**
+ * Define global Usart interrupts
+ * handler function pointer
+ */
+#define X(Usart, Data, A, B, C, BaudRate, VectRx, VectUDRE, VectTx) \
+    Handler::type Usart##_onReadReady = Handler::Disable; \
+    Handler::type Usart##_onDataSent = Handler::Disable; \
+    Handler::type Usart##_onWriteReady = Handler::Disable;
+USART_DEFINES
+#undef X
+
+/**
  * Usart transmiter and receiver mode
  */
 enum UsartMode : uint8_t {
@@ -63,6 +80,14 @@ struct UsartEntry
     const bytePtr BReg;
     const bytePtr CReg;
     const wordPtr baudRateReg;
+
+    /**
+     * Pointers to user defined
+     * interrupt routines
+     */
+    Handler::type* const _onReadReady;
+    Handler::type* const _onDataSent;
+    Handler::type* const _onWriteReady;
 
     /**
      * Initialize and enable the Usart with
@@ -199,20 +224,145 @@ struct UsartEntry
             isOverRunError() ||
             isParityError();
     }
+
+    /**
+     * Initialize and set up interrupt routine
+     * with given callback fired when 
+     * a byte is received
+     * Or disable the interrupt
+     */
+    inline void onReadReady
+        (Handler::type handler = Handler::Disable) const
+    {
+        if (handler != Handler::Disable) {
+            bits::add(*BReg, bits::Bit7);
+            *_onReadReady = handler;
+        } else {
+            bits::clear(*BReg, bits::Bit7);
+        }
+    }
+
+    /**
+     * Initialize and set up interrupt routine
+     * with given callback fired when 
+     * last outputed data is write to the wire
+     * Or disable the interrupt
+     */
+    inline void onDataSent
+        (Handler::type handler = Handler::Disable) const
+    {
+        if (handler != Handler::Disable) {
+            bits::add(*BReg, bits::Bit6);
+            *_onDataSent = handler;
+        } else {
+            bits::clear(*BReg, bits::Bit6);
+        }
+    }
+
+    /**
+     * Initialize and set up interrupt routine
+     * with given callback fired when 
+     * output buffer is ready for a new write
+     * Or disable the interrupt
+     */
+    inline void onWriteReady
+        (Handler::type handler = Handler::Disable) const
+    {
+        if (handler != Handler::Disable) {
+            bits::add(*BReg, bits::Bit5);
+            *_onWriteReady = handler;
+        } else {
+            bits::clear(*BReg, bits::Bit5);
+        }
+    }
+
+    /**
+     * Print the given character or string to
+     * initialized Usart
+     */
+    void print(char c) const
+    {
+        logic state = isr::getState();
+        isr::disable();
+        while (!isWriteReady());
+        write(c);
+        while (!isDataSent());
+        isr::setState(state);
+    }
+    void print(const char* str) const
+    {
+        logic state = isr::getState();
+        isr::disable();
+        for (int i=0;str[i]!='\0';i++) {
+            while (!isWriteReady());
+            write(str[i]);
+            while (!isDataSent());
+        }
+        isr::setState(state);
+    }
+    void print(int val) const
+    {
+        char str[6];
+        uint8_t i = 0;
+        int count = 10000;
+        bool isPrint = false;
+
+        while (count > 0) {
+            byte digit = val/count;
+            if (isPrint || count == 1 || digit != 0) {
+                str[i] = digit + 48;
+                isPrint = true;
+                i++;
+            }
+            val = val - count*digit;
+            count = count/10;
+        }
+        str[i] = '\0';
+        
+        print(str);
+    }
 };
 
 /**
  * Define const global object
  * as Usart instance
  */
-#define X(Usart, Data, A, B, C, BaudRate) \
+#define X(Usart, Data, A, B, C, BaudRate, VectRx, VectUDRE, VectTx) \
     const UsartEntry Usart = { \
         &Data, \
         &A, \
         &B, \
         &C, \
-        &BaudRate \
+        &BaudRate, \
+        &Usart##_onReadReady, \
+        &Usart##_onDataSent, \
+        &Usart##_onWriteReady \
     };
+USART_DEFINES
+#undef X
+
+/**
+ * Define Usart interruptions handler
+ */
+#define X(Usart, Data, A, B, C, BaudRate, VectRx, VectUDRE, VectTx) \
+    ISR(_VECTOR(VectRx)) \
+    { \
+        if (Usart##_onReadReady != Handler::Disable) { \
+            Usart##_onReadReady(Usart); \
+        } \
+    } \
+    ISR(_VECTOR(VectUDRE)) \
+    { \
+        if (Usart##_onWriteReady != Handler::Disable) { \
+            Usart##_onWriteReady(Usart); \
+        } \
+    } \
+    ISR(_VECTOR(VectTx)) \
+    { \
+        if (Usart##_onDataSent != Handler::Disable) { \
+            Usart##_onDataSent(Usart); \
+        } \
+    }
 USART_DEFINES
 #undef X
 
