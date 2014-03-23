@@ -10,17 +10,6 @@ struct UsartEntry;
 typedef isr::Handler<UsartEntry> Handler;
 
 /**
- * Define global Usart interrupts
- * handler function pointer
- */
-#define X(Usart, Data, A, B, C, BaudRate, VectRx, VectUDRE, VectTx) \
-    Handler::type Usart##_onReadReady = Handler::Disable; \
-    Handler::type Usart##_onDataSent = Handler::Disable; \
-    Handler::type Usart##_onWriteReady = Handler::Disable;
-USART_DEFINES
-#undef X
-
-/**
  * Usart transmiter and receiver mode
  */
 enum UsartMode : uint8_t {
@@ -82,12 +71,12 @@ struct UsartEntry
     const wordPtr baudRateReg;
 
     /**
-     * Pointers to user defined
+     * User defined
      * interrupt routines
      */
-    Handler::type* const _onReadReady;
-    Handler::type* const _onDataSent;
-    Handler::type* const _onWriteReady;
+    Handler::type onReadReadyFunc;
+    Handler::type onDataSentFunc;
+    Handler::type onWriteReadyFunc;
 
     /**
      * Initialize and enable the Usart with
@@ -232,11 +221,11 @@ struct UsartEntry
      * Or disable the interrupt
      */
     inline void onReadReady
-        (Handler::type handler = Handler::Disable) const
+        (Handler::type handler = Handler::Disable)
     {
         if (handler != Handler::Disable) {
             bits::add(*BReg, bits::Bit7);
-            *_onReadReady = handler;
+            onReadReadyFunc = handler;
         } else {
             bits::clear(*BReg, bits::Bit7);
         }
@@ -249,11 +238,11 @@ struct UsartEntry
      * Or disable the interrupt
      */
     inline void onDataSent
-        (Handler::type handler = Handler::Disable) const
+        (Handler::type handler = Handler::Disable)
     {
         if (handler != Handler::Disable) {
             bits::add(*BReg, bits::Bit6);
-            *_onDataSent = handler;
+            onDataSentFunc = handler;
         } else {
             bits::clear(*BReg, bits::Bit6);
         }
@@ -266,11 +255,11 @@ struct UsartEntry
      * Or disable the interrupt
      */
     inline void onWriteReady
-        (Handler::type handler = Handler::Disable) const
+        (Handler::type handler = Handler::Disable)
     {
         if (handler != Handler::Disable) {
             bits::add(*BReg, bits::Bit5);
-            *_onWriteReady = handler;
+            onWriteReadyFunc = handler;
         } else {
             bits::clear(*BReg, bits::Bit5);
         }
@@ -328,15 +317,15 @@ struct UsartEntry
  * as Usart instance
  */
 #define X(Usart, Data, A, B, C, BaudRate, VectRx, VectUDRE, VectTx) \
-    const UsartEntry Usart = { \
+    UsartEntry Usart = { \
         &Data, \
         &A, \
         &B, \
         &C, \
         &BaudRate, \
-        &Usart##_onReadReady, \
-        &Usart##_onDataSent, \
-        &Usart##_onWriteReady \
+        Handler::Disable, \
+        Handler::Disable, \
+        Handler::Disable \
     };
 USART_DEFINES
 #undef X
@@ -347,20 +336,20 @@ USART_DEFINES
 #define X(Usart, Data, A, B, C, BaudRate, VectRx, VectUDRE, VectTx) \
     ISR(_VECTOR(VectRx)) \
     { \
-        if (Usart##_onReadReady != Handler::Disable) { \
-            Usart##_onReadReady(Usart); \
+        if (Usart.onReadReadyFunc != Handler::Disable) { \
+            Usart.onReadReadyFunc(Usart); \
         } \
     } \
     ISR(_VECTOR(VectUDRE)) \
     { \
-        if (Usart##_onWriteReady != Handler::Disable) { \
-            Usart##_onWriteReady(Usart); \
+        if (Usart.onWriteReadyFunc != Handler::Disable) { \
+            Usart.onWriteReadyFunc(Usart); \
         } \
     } \
     ISR(_VECTOR(VectTx)) \
     { \
-        if (Usart##_onDataSent != Handler::Disable) { \
-            Usart##_onDataSent(Usart); \
+        if (Usart.onDataSentFunc != Handler::Disable) { \
+            Usart.onDataSentFunc(Usart); \
         } \
     }
 USART_DEFINES
