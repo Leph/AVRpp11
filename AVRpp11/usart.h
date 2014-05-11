@@ -83,6 +83,7 @@ struct UsartEntry
      * given operating mode, the baurate, stop bit
      * and parity check mode
      * The Usart is asynchronous, 8 bits
+     * (Do no modified interrupt callback)
      */
     inline void init(
         UsartMode mode, 
@@ -128,6 +129,7 @@ struct UsartEntry
     /**
      * Disable both read and write
      * Usart operation
+     * (Do not unregister interrupt callback)
      * (Free associated Gpio)
      */
     inline void disable() const
