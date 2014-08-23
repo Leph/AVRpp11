@@ -26,7 +26,7 @@ enum logic : uint8_t
 };
 
 /**
- * Define logic operator
+ * Definition of logic operator
  */
 inline logic operator||(logic a, logic b)
 {

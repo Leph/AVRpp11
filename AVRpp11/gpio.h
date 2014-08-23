@@ -17,7 +17,7 @@ enum GpioMode : uint8_t
  * General purpose
  * Inpur Output pin
  */
-struct GpioEntry
+struct GpioObject
 {
     /**
      * Direction, output and input
@@ -31,14 +31,14 @@ struct GpioEntry
     /**
      * Set the Pin to given mode
      */
-    inline void mode(GpioMode mode) const
+    inline void setMode(GpioMode mode) const
     {
         if (mode == Input) {
-            bits::clear(*dirReg, num);
+            bits::add(*dirReg, ~num);
         } else if (mode == Output) {
             bits::add(*dirReg, num);
         } else if (mode == InputPullUp) {
-            bits::clear(*dirReg, num);
+            bits::add(*dirReg, ~num);
             bits::add(*outReg, num);
         }
     }
@@ -53,6 +53,15 @@ struct GpioEntry
     }
 
     /**
+     * Toggle output logical value of
+     * given Gpio Pin (should be Output mode)
+     */
+    inline void toggle() const
+    {
+        bits::toggle(*outReg, num);
+    }
+
+    /**
      * Read and return the logical input value
      * of the Gpio Pin (should be in Input mode)
      */
@@ -62,7 +71,7 @@ struct GpioEntry
     }
 
     /**
-     * Read and return the logical outup value
+     * Read and return the logical output value
      * of current Gpio Pin
      */
     inline logic readOutput() const
@@ -76,7 +85,7 @@ struct GpioEntry
  * as Gpio Pin
  */
 #define X(Pin, Port, Num) \
-    const GpioEntry Pin = { \
+    const GpioObject Pin = { \
         &DDR##Port, \
         &PORT##Port, \
         &PIN##Port, \

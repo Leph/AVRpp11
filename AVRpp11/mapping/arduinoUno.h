@@ -23,10 +23,5 @@
     X(A4, C, 4) \
     X(A5, C, 5)
 
-#define USART_DEFINES \
-    X(Usart0, UDR0, UCSR0A, UCSR0B, UCSR0C, UBRR0, \
-        USART_RX_vect_num,  USART_UDRE_vect_num, USART_TX_vect_num)
-
-
 #endif
 

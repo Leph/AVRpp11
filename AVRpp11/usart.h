@@ -6,8 +6,8 @@ namespace usart {
 /**
  * Usart specific interrupt handler
  */
-struct UsartEntry;
-typedef isr::Handler<UsartEntry> Handler;
+struct UsartObject;
+typedef isr::Handler<UsartObject> Handler;
 
 /**
  * Usart transmiter and receiver mode
@@ -16,14 +16,15 @@ enum UsartMode : uint8_t {
     Read,
     Write,
     ReadWrite,
+    Disable,
 };
 
 /**
  * Usart number of stop bits
  */
-enum UsartStop : uint8_t {
-    Stop1,
-    Stop2,
+enum UsartBitStop : uint8_t {
+    BitStop1,
+    BitStop2,
 };
 
 /**
@@ -41,7 +42,13 @@ enum UsartParity : uint8_t {
  * divide by 100)
  */
 enum UsartBaudRate : uint16_t {
+    BaudRate2400 = 24,
+    BaudRate4800 = 48,
     BaudRate9600 = 96,
+    BaudRate19200 = 192,
+    BaudRate38400 = 384,
+    BaudRate57600 = 576,
+    BaudRate115200 = 1152,
 };
 
 /**
@@ -58,7 +65,7 @@ constexpr inline word computeBaudRate(
  * Asynchronous serial port
  * transmiter and receiver
  */
-struct UsartEntry
+struct UsartObject
 {
     /**
      * Data, control and status, baud rate
@@ -79,62 +86,63 @@ struct UsartEntry
     Handler::type onWriteReadyFunc;
 
     /**
-     * Initialize and enable the Usart with
-     * given operating mode, the baurate, stop bit
-     * and parity check mode
-     * The Usart is asynchronous, 8 bits
-     * (Do no modified interrupt callback)
+     * Configure given operating mode
+     * and set transmited frame to 8 bits
+     * and asynchronous mode
+     * (Do not change interrupt callback)
      */
-    inline void init(
-        UsartMode mode, 
-        UsartBaudRate baudrate,
-        UsartStop stop, 
-        UsartParity parity) const
+    inline void setMode(UsartMode mode) const
     {
         //Asynchronous mode
-        bits::clear(*CReg, bits::Bit6, bits::Bit7);
-        //Operating mode
-        if (mode == Read) {
-            bits::clear(*BReg, bits::Bit3);
-            bits::add(*BReg, bits::Bit4);
-        } else if (mode == Write) {
-            bits::add(*BReg, bits::Bit3);
-            bits::clear(*BReg, bits::Bit4);
-        } else if (mode == ReadWrite) {
-            bits::add(*BReg, bits::Bit3, bits::Bit4);
-        }
-        //Stop bit
-        if (stop == Stop1) {
-            bits::clear(*CReg, bits::Bit3);
-        } else if (stop == Stop2) {
-            bits::add(*CReg, bits::Bit3);
-        }
-        //Parity check
-        if (parity == ParityDisable) {
-            bits::clear(*CReg, bits::Bit4, bits::Bit5);
-        } else if (parity == ParityEven) {
-            bits::clear(*CReg, bits::Bit4);
-            bits::add(*CReg, bits::Bit5);
-        } else if (parity == ParityOdd) {
-            bits::add(*CReg, bits::Bit4, bits::Bit5);
-        }
+        bits::add(*CReg, ~bits::Bit6, ~bits::Bit7);
         //8 bits
         bits::add(*CReg, bits::Bit1, bits::Bit2);
-        bits::clear(*BReg, bits::Bit2);
-        //Baud rate
-        bits::clear(*AReg, bits::Bit1);
-        *baudRateReg = computeBaudRate(F_CPU, baudrate);
+        bits::add(*BReg, ~bits::Bit2);
+        //Set mode
+        if (mode == Read) {
+            bits::add(*BReg, ~bits::Bit3, bits::Bit4);
+        } else if (mode == Write) {
+            bits::add(*BReg, bits::Bit3, ~bits::Bit4);
+        } else if (mode == ReadWrite) {
+            bits::add(*BReg, bits::Bit3, bits::Bit4);
+        } else if (mode == Disable) {
+            bits::add(*BReg, ~bits::Bit3, ~bits::Bit4);
+        }
     }
 
     /**
-     * Disable both read and write
-     * Usart operation
-     * (Do not unregister interrupt callback)
-     * (Free associated Gpio)
+     * Configure given stop bit
      */
-    inline void disable() const
+    inline void setBitStop(UsartBitStop stop) const
     {
-        bits::clear(*BReg, bits::Bit3, bits::Bit4);
+        if (stop == BitStop1) {
+            bits::add(*CReg, ~bits::Bit3);
+        } else if (stop == BitStop2) {
+            bits::add(*CReg, bits::Bit3);
+        }
+    }
+
+    /**
+     * Configure given parity check
+     */
+    inline void setParity(UsartParity parity) const
+    {
+        if (parity == ParityDisable) {
+            bits::add(*CReg, ~bits::Bit4, ~bits::Bit5);
+        } else if (parity == ParityEven) {
+            bits::add(*CReg, ~bits::Bit4, bits::Bit5);
+        } else if (parity == ParityOdd) {
+            bits::add(*CReg, bits::Bit4, bits::Bit5);
+        }
+    }
+
+    /**
+     * Configure given baudrate
+     */
+    inline void setBaudrate(UsartBaudRate baudrate) const
+    {
+        bits::add(*AReg, ~bits::Bit1);
+        *baudRateReg = computeBaudRate(F_CPU, baudrate);
     }
 
     /**
@@ -225,11 +233,11 @@ struct UsartEntry
     inline void onReadReady
         (Handler::type handler = Handler::Disable)
     {
+        onReadReadyFunc = handler;
         if (handler != Handler::Disable) {
             bits::add(*BReg, bits::Bit7);
-            onReadReadyFunc = handler;
         } else {
-            bits::clear(*BReg, bits::Bit7);
+            bits::add(*BReg, ~bits::Bit7);
         }
     }
 
@@ -242,11 +250,11 @@ struct UsartEntry
     inline void onDataSent
         (Handler::type handler = Handler::Disable)
     {
+        onDataSentFunc = handler;
         if (handler != Handler::Disable) {
             bits::add(*BReg, bits::Bit6);
-            onDataSentFunc = handler;
         } else {
-            bits::clear(*BReg, bits::Bit6);
+            bits::add(*BReg, ~bits::Bit6);
         }
     }
 
@@ -259,11 +267,11 @@ struct UsartEntry
     inline void onWriteReady
         (Handler::type handler = Handler::Disable)
     {
+        onWriteReadyFunc = handler;
         if (handler != Handler::Disable) {
             bits::add(*BReg, bits::Bit5);
-            onWriteReadyFunc = handler;
         } else {
-            bits::clear(*BReg, bits::Bit5);
+            bits::add(*BReg, ~bits::Bit5);
         }
     }
 
@@ -271,6 +279,7 @@ struct UsartEntry
      * Print the given character or string to
      * initialized Usart
      */
+    /*
     void print(char c) const
     {
         logic state = isr::getState();
@@ -312,50 +321,39 @@ struct UsartEntry
         
         print(str);
     }
+    */
 };
 
 /**
  * Define const global object
  * as Usart instance
  */
-#define X(Usart, Data, A, B, C, BaudRate, VectRx, VectUDRE, VectTx) \
-    UsartEntry Usart = { \
-        &Data, \
-        &A, \
-        &B, \
-        &C, \
-        &BaudRate, \
-        Handler::Disable, \
-        Handler::Disable, \
-        Handler::Disable \
-    };
-USART_DEFINES
-#undef X
+UsartObject Usart0 = {
+    &UDR0, &UCSR0A, &UCSR0B, &UCSR0C, &UBRR0,
+    Handler::Disable, Handler::Disable, Handler::Disable 
+};
 
 /**
  * Define Usart interruptions handler
  */
-#define X(Usart, Data, A, B, C, BaudRate, VectRx, VectUDRE, VectTx) \
-    ISR(_VECTOR(VectRx)) \
-    { \
-        if (Usart.onReadReadyFunc != Handler::Disable) { \
-            Usart.onReadReadyFunc(Usart); \
-        } \
-    } \
-    ISR(_VECTOR(VectUDRE)) \
-    { \
-        if (Usart.onWriteReadyFunc != Handler::Disable) { \
-            Usart.onWriteReadyFunc(Usart); \
-        } \
-    } \
-    ISR(_VECTOR(VectTx)) \
-    { \
-        if (Usart.onDataSentFunc != Handler::Disable) { \
-            Usart.onDataSentFunc(Usart); \
-        } \
+ISR(USART_RX_vect)
+{
+    if (Usart0.onReadReadyFunc != Handler::Disable) {
+        Usart0.onReadReadyFunc(Usart0);
     }
-USART_DEFINES
-#undef X
+}
+ISR(USART_UDRE_vect)
+{
+    if (Usart0.onWriteReadyFunc != Handler::Disable) {
+        Usart0.onWriteReadyFunc(Usart0);
+    }
+}
+ISR(USART_TX_vect)
+{
+    if (Usart0.onDataSentFunc != Handler::Disable) {
+        Usart0.onDataSentFunc(Usart0);
+    }
+}
 
 }
 
