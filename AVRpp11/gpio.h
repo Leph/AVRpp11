@@ -58,7 +58,7 @@ struct GpioObject
      */
     inline void toggle() const
     {
-        bits::toggle(*outReg, num);
+        bits::add(*inReg, num);
     }
 
     /**
@@ -92,6 +92,15 @@ struct GpioObject
         bits::Bit##Num \
     };
 GPIO_DEFINES
+#undef X
+
+/**
+ * Define const global reference
+ * for Gpio Pin alias
+ */
+#define X(Pin, Alias) \
+    const GpioObject& Alias = Pin;
+PIN_ALIAS
 #undef X
 
 }
