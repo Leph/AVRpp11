@@ -23,5 +23,14 @@
     X(A4, C, 4) \
     X(A5, C, 5)
 
+#define PIN_ALIAS \
+    X(D0, RX) \
+    X(D1, TX) \
+    X(D13, Led) \
+    X(D13, SCK) \
+    X(D12, MISO) \
+    X(D11, MOSI) \
+    X(D10, SS)
+
 #endif
 

@@ -25,5 +25,13 @@
     X(Pin27, C, 4) \
     X(Pin28, C, 5)
 
+#define PIN_ALIAS \
+    X(Pin2, RX) \
+    X(Pin3, TX) \
+    X(Pin19, SCK) \
+    X(Pin18, MISO) \
+    X(Pin17, MOSI) \
+    X(Pin16, SS)
+
 #endif
 
