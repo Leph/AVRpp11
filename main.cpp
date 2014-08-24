@@ -2,12 +2,16 @@
 //#include "AVRpp11/mapping/atmega328p.h"
 #include "AVRpp11/avrpp11.h"
 
+#include "AVRpp11/lib/Printer.hpp"
+
 int main()
 {
+    //Logic operator
     volatile logic l1 = High || False;
     volatile logic l2 = High && False;
     volatile logic l3 = !True;
     
+    //Bits value
     volatile byte v1 = bits::value<byte>(bits::Bit2);
     volatile byte v2 = bits::value<byte>(bits::Bit1, bits::Bit2);
     volatile byte v3 = bits::value<byte>(bits::Bit1, ~bits::Bit2);
@@ -15,6 +19,7 @@ int main()
     volatile byte iv2 = bits::valueInv<byte>(~bits::Bit1, ~bits::Bit2);
     volatile byte iv3 = bits::valueInv<byte>(bits::Bit1, ~bits::Bit2);
     
+    //Bits manipulation
     bits::assign(DDRB, bits::Bit2);
     bits::assign(DDRB, bits::Bit2, bits::Bit3);
     bits::add(DDRB, bits::Bit2);
@@ -24,11 +29,13 @@ int main()
     bits::set(DDRB, bits::Bit2, High);
     bits::toggle(DDRB, bits::Bit2);
 
+    //Global interruptions
     isr::enable();
     isr::disable();
     volatile logic l5 = isr::getState();
     isr::setState(l5);
 
+    //Gpio
     gpio::D3.setMode(gpio::Output);
     gpio::D3.write(High);
     gpio::D2.setMode(gpio::Input);
@@ -36,6 +43,7 @@ int main()
     volatile logic l7 = gpio::D3.readOutput();
     gpio::D3.toggle();
 
+    //Usart
     isr::disable();
     usart::Usart0.setMode(usart::Write);
     usart::Usart0.setBitStop(usart::BitStop1);
@@ -49,6 +57,7 @@ int main()
     });
     isr::enable();
     
+    //Spi
     isr::disable();
     spi::Spi.setMode(spi::Master);
     spi::Spi.setBitOrder(spi::MSBFirst);
@@ -57,6 +66,7 @@ int main()
     spi::Spi.setClockDivider(spi::ClockDiv2);
     isr::enable();
     
+    //Timer0 8 bits
     isr::disable();
     gpio::D13.setMode(gpio::Output);
     timer::Timer0.setCounterMode(timer::WaveNormalTopNormal);
@@ -68,6 +78,7 @@ int main()
     });
     isr::enable();
     
+    //Timer1 16 bits
     isr::disable();
     gpio::D13.setMode(gpio::Output);
     timer::Timer1.setCounterMode(timer::WaveNormalTopCompareA);
@@ -79,7 +90,15 @@ int main()
         gpio::D13.toggle();
     });
     isr::enable();
-    
+
+    //Printer
+    Printer::init(usart::BaudRate9600);
+    Printer::write("> example ");
+    Printer::write(404);
+    Printer::write(" and ");
+    Printer::write(-23456);
+    Printer::endl();
+
     while (1);
 
     return 0;
