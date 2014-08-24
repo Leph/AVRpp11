@@ -273,54 +273,6 @@ struct UsartObject
             bits::add(*BReg, ~bits::Bit5);
         }
     }
-
-    /**
-     * Print the given character or string to
-     * initialized Usart
-     */
-    /*
-    void print(char c) const
-    {
-        logic state = isr::getState();
-        isr::disable();
-        while (!isWriteReady());
-        write(c);
-        while (!isDataSent());
-        isr::setState(state);
-    }
-    void print(const char* str) const
-    {
-        logic state = isr::getState();
-        isr::disable();
-        for (int i=0;str[i]!='\0';i++) {
-            while (!isWriteReady());
-            write(str[i]);
-            while (!isDataSent());
-        }
-        isr::setState(state);
-    }
-    void print(int val) const
-    {
-        char str[6];
-        uint8_t i = 0;
-        int count = 10000;
-        bool isPrint = false;
-
-        while (count > 0) {
-            byte digit = val/count;
-            if (isPrint || count == 1 || digit != 0) {
-                str[i] = digit + 48;
-                isPrint = true;
-                i++;
-            }
-            val = val - count*digit;
-            count = count/10;
-        }
-        str[i] = '\0';
-        
-        print(str);
-    }
-    */
 };
 
 /**
