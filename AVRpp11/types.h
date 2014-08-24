@@ -14,6 +14,13 @@ typedef volatile uint16_t* wordPtr;
 typedef volatile uint16_t& wordRef;
 
 /**
+ * Definition of signed 8 and 16 bits
+ * basic type
+ */
+typedef int8_t sbyte;
+typedef int16_t sword;
+
+/**
  * Define both logic levels
  * low and high (false or true)
  */
