@@ -14,8 +14,8 @@ namespace isr {
  */
 template <class T>
 struct Handler {
-    typedef void(*type)(const T&);
-    typedef const T& arg;
+    typedef void(*type)(T&);
+    typedef T& arg;
     constexpr static type Disable = nullptr;
 };
 template <>
