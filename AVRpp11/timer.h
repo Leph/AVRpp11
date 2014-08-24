@@ -4,14 +4,6 @@
 namespace timer {
 
 /**
- * Timer specific interrupt handler
- */
-struct Timer0Object;
-typedef isr::Handler<Timer0Object> HandlerTimer0;
-struct Timer1Object;
-typedef isr::Handler<Timer1Object> HandlerTimer1;
-
-/**
  * Timer wave generation mode
  * WaveNormal and WavePwm
  * (See output pin mode)
@@ -83,6 +75,11 @@ enum TimerClock : uint8_t {
 struct Timer0Object
 {
     /**
+     * Timer specific interrupt handler
+     */
+    typedef isr::Handler<Timer0Object> Handler;
+
+    /**
      * A and B control, counter, A and B compare, 
      * mask and flag registers
      */
@@ -98,9 +95,9 @@ struct Timer0Object
      * User defined
      * interrupt routines
      */
-    HandlerTimer0::type onMatchAFunc;
-    HandlerTimer0::type onMatchBFunc;
-    HandlerTimer0::type onOverflowFunc;
+    Handler::type onMatchAFunc;
+    Handler::type onMatchBFunc;
+    Handler::type onOverflowFunc;
 
     /**
      * Configure given timer wave and top counter mode
@@ -263,30 +260,30 @@ struct Timer0Object
      * the counter loops to zero)
      */
     inline void onMatchA
-        (HandlerTimer0::type handler = HandlerTimer0::Disable)
+        (Handler::type handler = Handler::Disable)
     {
         onMatchAFunc = handler;
-        if (handler != HandlerTimer0::Disable) {
+        if (handler != Handler::Disable) {
             bits::add(*maskReg, bits::Bit1);
         } else {
             bits::add(*maskReg, ~bits::Bit1);
         }
     }
     inline void onMatchB
-        (HandlerTimer0::type handler = HandlerTimer0::Disable)
+        (Handler::type handler = Handler::Disable)
     {
         onMatchBFunc = handler;
-        if (handler != HandlerTimer0::Disable) {
+        if (handler != Handler::Disable) {
             bits::add(*maskReg, bits::Bit2);
         } else {
             bits::add(*maskReg, ~bits::Bit2);
         }
     }
     inline void onOverflow
-        (HandlerTimer0::type handler = HandlerTimer0::Disable)
+        (Handler::type handler = Handler::Disable)
     {
         onOverflowFunc = handler;
-        if (handler != HandlerTimer0::Disable) {
+        if (handler != Handler::Disable) {
             bits::add(*maskReg, bits::Bit0);
         } else {
             bits::add(*maskReg, ~bits::Bit0);
@@ -299,6 +296,11 @@ struct Timer0Object
  */
 struct Timer1Object
 {
+    /**
+     * Timer specific interrupt handler
+     */
+    typedef isr::Handler<Timer1Object> Handler;
+    
     /**
      * A, B and C control, counter, A and B compare, 
      * mask and flag registers
@@ -317,9 +319,9 @@ struct Timer1Object
      * User defined
      * interrupt routines
      */
-    HandlerTimer1::type onMatchAFunc;
-    HandlerTimer1::type onMatchBFunc;
-    HandlerTimer1::type onOverflowFunc;
+    Handler::type onMatchAFunc;
+    Handler::type onMatchBFunc;
+    Handler::type onOverflowFunc;
 
     /**
      * Configure given timer wave and top counter mode
@@ -483,30 +485,30 @@ struct Timer1Object
      * the counter loops to zero)
      */
     inline void onMatchA
-        (HandlerTimer1::type handler = HandlerTimer1::Disable)
+        (Handler::type handler = Handler::Disable)
     {
         onMatchAFunc = handler;
-        if (handler != HandlerTimer1::Disable) {
+        if (handler != Handler::Disable) {
             bits::add(*maskReg, bits::Bit1);
         } else {
             bits::add(*maskReg, ~bits::Bit1);
         }
     }
     inline void onMatchB
-        (HandlerTimer1::type handler = HandlerTimer1::Disable)
+        (Handler::type handler = Handler::Disable)
     {
         onMatchBFunc = handler;
-        if (handler != HandlerTimer1::Disable) {
+        if (handler != Handler::Disable) {
             bits::add(*maskReg, bits::Bit2);
         } else {
             bits::add(*maskReg, ~bits::Bit2);
         }
     }
     inline void onOverflow
-        (HandlerTimer1::type handler = HandlerTimer1::Disable)
+        (Handler::type handler = Handler::Disable)
     {
         onOverflowFunc = handler;
-        if (handler != HandlerTimer1::Disable) {
+        if (handler != Handler::Disable) {
             bits::add(*maskReg, bits::Bit0);
         } else {
             bits::add(*maskReg, ~bits::Bit0);
@@ -520,11 +522,13 @@ struct Timer1Object
  */
 Timer0Object Timer0 = {
     &TCCR0A, &TCCR0B, &TCNT0, &OCR0A, &OCR0B, &TIMSK0, &TIFR0,
-    HandlerTimer0::Disable, HandlerTimer0::Disable, HandlerTimer0::Disable 
+    Timer0Object::Handler::Disable, Timer0Object::Handler::Disable, 
+    Timer0Object::Handler::Disable 
 };
 Timer1Object Timer1 = {
     &TCCR1A, &TCCR1B, &TCCR1C, &TCNT1, &OCR1A, &OCR1B, &ICR1, &TIMSK1, &TIFR1,
-    HandlerTimer1::Disable, HandlerTimer1::Disable, HandlerTimer1::Disable 
+    Timer1Object::Handler::Disable, Timer1Object::Handler::Disable, 
+    Timer1Object::Handler::Disable 
 };
 
 /**
@@ -532,37 +536,37 @@ Timer1Object Timer1 = {
  */
 ISR(TIMER0_COMPA_vect)
 {
-    if (Timer0.onMatchAFunc != HandlerTimer0::Disable) {
+    if (Timer0.onMatchAFunc != Timer0Object::Handler::Disable) {
         Timer0.onMatchAFunc(Timer0);
     }
 }
 ISR(TIMER0_COMPB_vect)
 {
-    if (Timer0.onMatchBFunc != HandlerTimer0::Disable) {
+    if (Timer0.onMatchBFunc != Timer0Object::Handler::Disable) {
         Timer0.onMatchBFunc(Timer0);
     }
 }
 ISR(TIMER0_OVF_vect)
 {
-    if (Timer0.onOverflowFunc != HandlerTimer0::Disable) {
+    if (Timer0.onOverflowFunc != Timer0Object::Handler::Disable) {
         Timer0.onOverflowFunc(Timer0);
     }
 }
 ISR(TIMER1_COMPA_vect)
 {
-    if (Timer1.onMatchAFunc != HandlerTimer1::Disable) {
+    if (Timer1.onMatchAFunc != Timer1Object::Handler::Disable) {
         Timer1.onMatchAFunc(Timer1);
     }
 }
 ISR(TIMER1_COMPB_vect)
 {
-    if (Timer1.onMatchBFunc != HandlerTimer1::Disable) {
+    if (Timer1.onMatchBFunc != Timer1Object::Handler::Disable) {
         Timer1.onMatchBFunc(Timer1);
     }
 }
 ISR(TIMER1_OVF_vect)
 {
-    if (Timer1.onOverflowFunc != HandlerTimer1::Disable) {
+    if (Timer1.onOverflowFunc != Timer1Object::Handler::Disable) {
         Timer1.onOverflowFunc(Timer1);
     }
 }

@@ -15,13 +15,20 @@ namespace isr {
 template <class T>
 struct Handler {
     typedef void(*type)(const T&);
+    typedef const T& arg;
     constexpr static type Disable = nullptr;
 };
 template <>
 struct Handler<void> {
     typedef void(*type)();
+    typedef void arg;
     constexpr static type Disable = nullptr;
 };
+
+/**
+ * Macro for interrupt handler argument type deduction
+ */
+#define HandlerArg(Object) decltype(Object)::Handler::arg
 
 /**
  * Enable or disable (all) global interrupts

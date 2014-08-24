@@ -4,12 +4,6 @@
 namespace spi {
 
 /**
- * Spi specific interrupt handler
- */
-struct SpiObject;
-typedef isr::Handler<SpiObject> Handler;
-
-/**
  * Spi mode
  * On master mode, slave select (SS) has to 
  * be controled by user in ouput mode
@@ -65,6 +59,11 @@ enum SpiClockDivider : uint8_t {
  */
 struct SpiObject
 {
+    /**
+     * Spi specific interrupt handler
+     */
+    typedef isr::Handler<SpiObject> Handler;
+
     /**
      * Control, status and data registers
      */
@@ -215,7 +214,7 @@ struct SpiObject
  */
 SpiObject Spi = {
     &SPCR, &SPSR, &SPDR,
-    Handler::Disable, 
+    SpiObject::Handler::Disable, 
 };
 
 /**
@@ -223,7 +222,7 @@ SpiObject Spi = {
  */
 ISR(SPI_STC_vect)
 {
-    if (Spi.onTransfertCompletFunc != Handler::Disable) {
+    if (Spi.onTransfertCompletFunc != SpiObject::Handler::Disable) {
         Spi.onTransfertCompletFunc(Spi);
     }
 }

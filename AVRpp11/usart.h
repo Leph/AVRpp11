@@ -4,12 +4,6 @@
 namespace usart {
 
 /**
- * Usart specific interrupt handler
- */
-struct UsartObject;
-typedef isr::Handler<UsartObject> Handler;
-
-/**
  * Usart transmiter and receiver mode
  */
 enum UsartMode : uint8_t {
@@ -67,6 +61,11 @@ constexpr inline word computeBaudRate(
  */
 struct UsartObject
 {
+    /**
+     * Usart specific interrupt handler
+     */
+    typedef isr::Handler<UsartObject> Handler;
+
     /**
      * Data, control and status, baud rate
      * usart registers
@@ -330,7 +329,8 @@ struct UsartObject
  */
 UsartObject Usart0 = {
     &UDR0, &UCSR0A, &UCSR0B, &UCSR0C, &UBRR0,
-    Handler::Disable, Handler::Disable, Handler::Disable 
+    UsartObject::Handler::Disable, UsartObject::Handler::Disable, 
+    UsartObject::Handler::Disable 
 };
 
 /**
@@ -338,19 +338,19 @@ UsartObject Usart0 = {
  */
 ISR(USART_RX_vect)
 {
-    if (Usart0.onReadReadyFunc != Handler::Disable) {
+    if (Usart0.onReadReadyFunc != UsartObject::Handler::Disable) {
         Usart0.onReadReadyFunc(Usart0);
     }
 }
 ISR(USART_UDRE_vect)
 {
-    if (Usart0.onWriteReadyFunc != Handler::Disable) {
+    if (Usart0.onWriteReadyFunc != UsartObject::Handler::Disable) {
         Usart0.onWriteReadyFunc(Usart0);
     }
 }
 ISR(USART_TX_vect)
 {
-    if (Usart0.onDataSentFunc != Handler::Disable) {
+    if (Usart0.onDataSentFunc != UsartObject::Handler::Disable) {
         Usart0.onDataSentFunc(Usart0);
     }
 }
