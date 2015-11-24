@@ -145,6 +145,17 @@ struct UsartObject
     }
 
     /**
+     * Manually configure the baudrate register.
+     * If isDoubleSpeed is true, actual transmission speed
+     * is double. See reference baudrate table on datasheet.
+     */
+    inline void setBaudrate(logic isDoubleSpeed, word baudrate) const
+    {
+        bits::set(*AReg, bits::Bit1, isDoubleSpeed);
+        *baudRateReg = baudrate;
+    }
+
+    /**
      * Read or write a byte to or from
      * Usart data register
      */

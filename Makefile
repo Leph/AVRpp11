@@ -13,7 +13,7 @@ F_CPU = 16000000UL
 MCU = atmega328p
 
 #Compilation flags
-FLAGS = -O2 -std=c++11
+FLAGS = -Os -std=c++11
 
 #Directory where binaries are generated
 BUILD_DIRECTORY = build

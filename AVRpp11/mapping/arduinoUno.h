@@ -1,5 +1,5 @@
-#ifndef ATMEGA328P_H
-#define ATMEGA328P_H
+#ifndef ARDUINOUNO_H
+#define ARDUINOUNO_H
 
 #define GPIO_DEFINES \
     X(D0, D, 0) \

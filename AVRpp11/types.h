@@ -47,6 +47,18 @@ inline logic operator!(logic a)
 {
     return (logic)(!(uint8_t)a);
 }
+inline logic operator==(logic a, logic b)
+{
+    return !(!a && b) || (a && !b);
+}
+inline logic logic_cast(byte a)
+{
+    return (logic)(a > 0);
+}
+inline logic logic_cast(word a)
+{
+    return (logic)(a > 0);
+}
 
 #endif
 

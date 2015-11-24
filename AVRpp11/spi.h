@@ -32,8 +32,8 @@ enum SpiClockIdle : uint8_t {
 };
 
 /**
- * Spi data write on wire on leading (first) or
- * trailing (last) clock edge
+ * Spi data read and write on wire on 
+ * leading (first) or trailing (last) clock edge
  */
 enum SpiClockEdge : uint8_t {
     ClockLeading,
@@ -80,13 +80,22 @@ struct SpiObject
     /**
      * Configure and enable Spi mode or
      * disable it
+     * Configure Spi Gpio io mode
      */
     inline void setMode(SpiMode mode) const
     {
         //Set mode
         if (mode == Master) {
+            gpio::SCK.setMode(gpio::Output);
+            gpio::MISO.setMode(gpio::Input);
+            gpio::MOSI.setMode(gpio::Output);
+            gpio::SS.setMode(gpio::Output);
             bits::add(*controlReg, bits::Bit6, bits::Bit4);
         } else if (mode == Slave) {
+            gpio::SCK.setMode(gpio::Input);
+            gpio::MISO.setMode(gpio::Output);
+            gpio::MOSI.setMode(gpio::Input);
+            gpio::SS.setMode(gpio::Input);
             bits::add(*controlReg, bits::Bit6, ~bits::Bit4);
         } else if (mode == Disable) {
             bits::add(*controlReg, ~bits::Bit6);

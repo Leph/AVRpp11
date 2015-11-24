@@ -143,7 +143,7 @@ inline void add(volatile T& mem, BitNums... bitNums)
 template <class T>
 inline logic get(volatile T& mem, BitNum num)
 {
-    return static_cast<logic>(mem & value<T>(num));
+    return logic_cast((T)(mem & value<T>(num)));
 }
 
 /**
