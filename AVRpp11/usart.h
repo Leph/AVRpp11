@@ -6,7 +6,7 @@ namespace usart {
 /**
  * Usart transmiter and receiver mode
  */
-enum UsartMode : uint8_t {
+enum UsartMode : byte {
     Read,
     Write,
     ReadWrite,
@@ -16,7 +16,7 @@ enum UsartMode : uint8_t {
 /**
  * Usart number of stop bits
  */
-enum UsartBitStop : uint8_t {
+enum UsartBitStop : byte {
     BitStop1,
     BitStop2,
 };
@@ -24,7 +24,7 @@ enum UsartBitStop : uint8_t {
 /**
  * Usart parity check mode
  */
-enum UsartParity : uint8_t {
+enum UsartParity : byte {
     ParityDisable,
     ParityEven,
     ParityOdd,
@@ -35,7 +35,7 @@ enum UsartParity : uint8_t {
  * (enum value are baudrate speed 
  * divide by 100)
  */
-enum UsartBaudRate : uint16_t {
+enum UsartBaudRate : word {
     BaudRate2400 = 24,
     BaudRate4800 = 48,
     BaudRate9600 = 96,

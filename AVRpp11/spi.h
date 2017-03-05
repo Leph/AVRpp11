@@ -8,7 +8,7 @@ namespace spi {
  * On master mode, slave select (SS) has to 
  * be controled by user in ouput mode
  */
-enum SpiMode : uint8_t {
+enum SpiMode : byte {
     Master,
     Slave,
     Disable,
@@ -18,7 +18,7 @@ enum SpiMode : uint8_t {
  * Spi data transmiter order
  * (Most or Least significant bit first)
  */
-enum SpiBitOrder : uint8_t {
+enum SpiBitOrder : byte {
     MSBFirst,
     LSBFirst,
 };
@@ -26,7 +26,7 @@ enum SpiBitOrder : uint8_t {
 /**
  * Spi clock idle logic level
  */
-enum SpiClockIdle : uint8_t {
+enum SpiClockIdle : byte {
     ClockLow,
     ClockHigh,
 };
@@ -35,7 +35,7 @@ enum SpiClockIdle : uint8_t {
  * Spi data read and write on wire on 
  * leading (first) or trailing (last) clock edge
  */
-enum SpiClockEdge : uint8_t {
+enum SpiClockEdge : byte {
     ClockLeading,
     ClockTrailing,
 };
@@ -44,7 +44,7 @@ enum SpiClockEdge : uint8_t {
  * Spi internal clock divider
  * (Set up transmission speed)
  */
-enum SpiClockDivider : uint8_t {
+enum SpiClockDivider : byte {
     ClockDiv2,
     ClockDiv4,
     ClockDiv8,

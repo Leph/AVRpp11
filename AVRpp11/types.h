@@ -24,7 +24,7 @@ typedef int16_t sword;
  * Define both logic levels
  * low and high (false or true)
  */
-enum logic : uint8_t
+enum logic : byte
 {
     Low = 0,
     High = 1,
@@ -45,7 +45,7 @@ inline logic operator&&(logic a, logic b)
 }
 inline logic operator!(logic a)
 {
-    return (logic)(!(uint8_t)a);
+    return (logic)(!(byte)a);
 }
 inline logic operator==(logic a, logic b)
 {

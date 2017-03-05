@@ -13,7 +13,7 @@ namespace timer {
  * with A output compare register (therefor the output 
  * A Pin should not be used as output)
  */
-enum TimerCounterMode : uint8_t {
+enum TimerCounterMode : byte {
     WaveNormalTopNormal,
     WaveNormalTopCompareA,
     WavePwmTopNormal,
@@ -35,7 +35,7 @@ enum TimerCounterMode : uint8_t {
  * at bottom and set at compare match
  * The Gpio Pin have to be in output mode
  */
-enum TimerPinMode : uint8_t {
+enum TimerPinMode : byte {
     PinDisable,
     PinToggle,
     PinSet,
@@ -57,7 +57,7 @@ enum TimerPinMode : uint8_t {
  * (The external input pin can be either in 
  * input or output Gpio mode)
  */
-enum TimerClock : uint8_t {
+enum TimerClock : byte {
     ClockStop,
     ClockDiv1,
     ClockDiv8,

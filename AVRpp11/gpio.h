@@ -6,7 +6,7 @@ namespace gpio {
 /**
  * Gpio pin mode
  */
-enum GpioMode : uint8_t
+enum GpioMode : byte
 {
     Input,
     Output,

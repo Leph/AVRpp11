@@ -8,7 +8,7 @@ namespace bits {
  * up to 16 bits (word)
  * zero indexed
  */
-enum BitNum : uint8_t
+enum BitNum : byte
 {
     Bit0 = 0,
     Bit1 = 1,
@@ -34,7 +34,7 @@ enum BitNum : uint8_t
  * zero indexed
  * (Represent a cleared bit)
  */
-enum class InvBitNum : uint8_t
+enum class InvBitNum : byte
 {
     Bit0 = 0,
     Bit1 = 1,
@@ -59,7 +59,7 @@ enum class InvBitNum : uint8_t
  * inverted bit number
  */
 InvBitNum operator~(BitNum num) {
-    return static_cast<InvBitNum>(static_cast<uint8_t>(num));
+    return static_cast<InvBitNum>(static_cast<byte>(num));
 }
 
 /**
@@ -69,7 +69,7 @@ InvBitNum operator~(BitNum num) {
 template <class T>
 inline T value(BitNum num)
 {
-    return (1 << static_cast<uint8_t>(num));
+    return (1 << static_cast<byte>(num));
 }
 template <class T>
 inline T value(InvBitNum num)
@@ -99,7 +99,7 @@ inline T valueInv(BitNum num)
 template <class T>
 inline T valueInv(InvBitNum num)
 {
-    return (1 << static_cast<uint8_t>(num));
+    return (1 << static_cast<byte>(num));
 }
 template <class T, class ... BitNums>
 inline T valueInv(InvBitNum num, BitNums... bitNums)
