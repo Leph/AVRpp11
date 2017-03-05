@@ -188,6 +188,15 @@ class Printer
             write("\r\n");
         }
 
+        /**
+         * Wait that all writen characters 
+         * are sent on the bus
+         */
+        static inline void waitFlush()
+        {
+            while(_begin != _end);
+        }
+
     private:
 
         /**
@@ -202,17 +211,25 @@ class Printer
          */
         static inline void queueByte(byte c)
         {
-            while (_end+1 == _begin || 
-                (_end == bufferSize-1 && _begin == 0));
+            //Wait for space in circular buffer
+            while (
+                _end+1 == _begin || 
+                (_end == bufferSize-1 && _begin == 0)
+            );
 
-            usart::Usart0.onWriteReady();
+            isr::disable();
+            //Enable if necessary
+            if (_begin == _end) {
+                usart::Usart0.onWriteReady(Printer::isrHandler);
+            }
+            //Append buffer
             _buffer[_end] = c;
             if (_end == bufferSize-1) {
                 _end = 0;
             } else {
                 _end++;
             }
-            usart::Usart0.onWriteReady(Printer::isrHandler);
+            isr::enable();
         }
 
         /**
@@ -220,15 +237,21 @@ class Printer
          */
         static void isrHandler(HandlerArg(usart::Usart0) u)
         {
-            if (_begin == _end) {
-                u.onWriteReady();
-            } else {
+            if (_begin != _end) {
+                //Write next character
+                //if available
                 u.write(_buffer[_begin]);
+                //Pop it
                 if (_begin == bufferSize-1) {
                     _begin = 0;
                 } else {
                     _begin++;
                 }
+            }
+            //Disable the interrupt when 
+            //the buffer is empty
+            if (_begin == _end) {
+                u.onWriteReady();
             }
         }
 };

@@ -68,7 +68,6 @@ enum TimerClock : byte {
     ClockExternalRising,
 }; 
 
-
 /**
  * Hardware Timer0 8 bits
  */
