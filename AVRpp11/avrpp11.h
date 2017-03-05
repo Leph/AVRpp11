@@ -8,6 +8,7 @@
 #include "bits.h"
 #include "isr.h"
 #include "gpio.h"
+#include "adc.h"
 #include "usart.h"
 #include "spi.h"
 #include "timer.h"
