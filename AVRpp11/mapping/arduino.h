@@ -1,5 +1,9 @@
-#ifndef ARDUINOUNO_H
-#define ARDUINOUNO_H
+#ifndef ARDUINO_H
+#define ARDUINO_H
+
+/**
+ * Mapping for both arduino Uno and Nano
+ */
 
 #define GPIO_DEFINES \
     X(D0, D, 0) \
