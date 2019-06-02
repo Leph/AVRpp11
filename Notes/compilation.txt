@@ -17,6 +17,9 @@ avrdude -c avrisp2 -p ATMEGA328P -P usb -U lfuse:r:-:h -U hfuse:r:-:h -U efuse:r
 #Flash programm (with ISP)
 avrdude -c avrisp2 -p ATMEGA328P -P usb -U flash:w:test_atmega.hex
 
-#Flash programm (for Arduino)
+#Flash programm (for Arduino Uno)
 avrdude -c arduino -p ATMEGA328P -P /dev/ttyACM0 -b 115200 -U flash:w:test.ihex
+
+#Flash programm (for Arduino Nano)
+avrdude -c arduino -p ATMEGA328P -P /dev/ttyUSB0 -b 57600 -U flash:w:test.ihex
 

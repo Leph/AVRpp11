@@ -31,13 +31,15 @@ def: build
 build:
 	 mkdir -p $(BUILD_DIRECTORY)
 
-install-arduino: all
+install-arduino-uno: all
 	 avrdude -c arduino -p $(MCU) -P /dev/ttyACM0 -b 115200 -U flash:w:$(BUILD_DIRECTORY)/bin.hex
+install-arduino-nano: all
+	 avrdude -c arduino -p $(MCU) -P /dev/ttyUSB0 -b 57600 -U flash:w:$(BUILD_DIRECTORY)/bin.hex
 install-isp: all
 	 avrdude -c avrisp2 -p $(MCU) -P usb -U flash:w:$(BUILD_DIRECTORY)/bin.hex
 
 clean:
 	 rm -rf $(BUILD_DIRECTORY)
 
-.PHONY: all build asm def install-arduino install-isp clean
+.PHONY: all build asm def install-arduino-uno install-arduino-nano install-isp clean
 
