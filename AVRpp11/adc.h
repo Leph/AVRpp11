@@ -166,8 +166,6 @@ struct AdcObject
      */
     inline word readValue() const
     {
-        return ADC;
-
         //Read low byte first and then high part
         word value;
         value = *dataLowReg & 0xFF;
